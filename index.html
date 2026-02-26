@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五子棋游戏 - 球球 & 影子</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🏀 五子棋</h1>
+        
+        <div class="game-info">
+            <div id="status">当前：黑棋</div>
+            <button id="restartBtn" onclick="game.restart()">重新开始</button>
+        </div>
+        
+        <div class="board-container">
+            <canvas id="board" width="600" height="600"></canvas>
+        </div>
+        
+        <div class="footer">
+            <p>Created by 球球 & 影子</p>
+        </div>
+    </div>
+    
+    <script src="js/game.js"></script>
+</body>
+</html>
