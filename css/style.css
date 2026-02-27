@@ -100,17 +100,31 @@ h1 {
 
 /* 响应式 */
 @media (max-width: 650px) {
-    .board-container {
-        padding: 10px;
+    .container {
+        padding: 15px;
+        margin: 10px;
     }
     
-    #board {
+    .board-container {
+        padding: 8px;
         width: 100%;
         max-width: 350px;
-        height: auto;
+        box-sizing: border-box;
+    }
+
+    #board {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
+        display: block;
+    }
+
+    h1 {
+        font-size: 1.5em;
     }
     
-    h1 {
-        font-size: 1.8em;
+    .game-info {
+        flex-direction: column;
+        gap: 10px;
     }
 }

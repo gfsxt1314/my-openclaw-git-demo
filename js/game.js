@@ -39,6 +39,11 @@ class GobangGame {
         this.gameOver = false;
         this.winner = null;
         
+        // 设置 Canvas 内部尺寸（逻辑尺寸）
+        const logicalSize = this.padding * 2 + (this.boardSize - 1) * this.cellSize;
+        this.canvas.width = logicalSize;
+        this.canvas.height = logicalSize;
+        
         this.updateStatus();
         this.drawBoard();
     }
@@ -150,11 +155,14 @@ class GobangGame {
             
             const rect = this.canvas.getBoundingClientRect();
             
-            // 计算 Canvas 显示尺寸与内部尺寸的缩放比例
+            // 计算 Canvas 实际显示尺寸与内部尺寸的缩放比例
+            // this.canvas.width/height 是 Canvas 的内部像素尺寸（600x600）
+            // rect.width/height 是 Canvas 在页面上的实际显示尺寸（可能经过 CSS 缩放）
             const scaleX = this.canvas.width / rect.width;
             const scaleY = this.canvas.height / rect.height;
             
-            // 将鼠标坐标转换为 Canvas 内部坐标
+            // 将鼠标坐标（相对于视口）转换为 Canvas 内部坐标
+            // 考虑可能的滚动偏移（虽然 getBoundingClientRect 已经包含滚动）
             const x = (e.clientX - rect.left) * scaleX;
             const y = (e.clientY - rect.top) * scaleY;
             

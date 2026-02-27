@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五子棋点击测试</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .debug-info {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .test-point {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: red;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏀 五子棋点击测试</h1>
+        
+        <div class="game-info">
+            <div id="status">点击棋盘任意位置测试坐标</div>
+            <button onclick="clearTestPoints()">清除测试点</button>
+        </div>
+        
+        <div class="board-container" style="position: relative;">
+            <canvas id="board" width="600" height="600"></canvas>
+        </div>
+        
+        <div class="debug-info" id="debugInfo">
+点击棋盘查看坐标信息...
+        </div>
+        
+        <div class="footer">
+            <p>Created by 球球 & 影子</p>
+        </div>
+    </div>
+    
+    <script src="js/game.js"></script>
+    <script>
+        // 覆盖原有点击事件，添加调试功能
+        const canvas = document.getElementById('board');
+        const debugInfo = document.getElementById('debugInfo');
+        
+        // 游戏配置（与 game.js 保持一致）
+        const boardSize = 15;
+        const cellSize = 40;
+        const padding = 20;
+        
+        // 绘制简单棋盘
+        function drawTestBoard() {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 画背景
+            ctx.fillStyle = '#dcb35c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 画网格
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i < boardSize; i++) {
+                // 横线
+                ctx.beginPath();
+                ctx.moveTo(padding, padding + i * cellSize);
+                ctx.lineTo(padding + (boardSize - 1) * cellSize, padding + i * cellSize);
+                ctx.stroke();
+                
+                // 竖线
+                ctx.beginPath();
+                ctx.moveTo(padding + i * cellSize, padding);
+                ctx.lineTo(padding + i * cellSize, padding + (boardSize - 1) * cellSize);
+                ctx.stroke();
+            }
+            
+            // 画星位
+            const starPoints = [[3, 3], [3, 11], [7, 7], [11, 3], [11, 11]];
+            ctx.fillStyle = '#000';
+            starPoints.forEach(([x, y]) => {
+                ctx.beginPath();
+                ctx.arc(padding + x * cellSize, padding + y * cellSize, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        
+        function clearTestPoints() {
+            document.querySelectorAll('.test-point').forEach(el => el.remove());
+            drawTestBoard();
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            
+            // 原始鼠标坐标
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            // 相对于 Canvas 的坐标
+            const relativeX = mouseX - rect.left;
+            const relativeY = mouseY - rect.top;
+            
+            // 转换为 Canvas 内部坐标
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const canvasX = relativeX * scaleX;
+            const canvasY = relativeY * scaleY;
+            
+            // 计算交叉点
+            const col = Math.round((canvasX - padding) / cellSize);
+            const row = Math.round((canvasY - padding) / cellSize);
+            
+            // 计算应该在的位置
+            const expectedX = padding + col * cellSize;
+            const expectedY = padding + row * cellSize;
+            
+            // 显示调试信息
+            const info = `
+=== 点击坐标分析 ===
+视口坐标: clientX=${mouseX.toFixed(2)}, clientY=${mouseY.toFixed(2)}
+Canvas 显示尺寸: ${rect.width.toFixed(2)} x ${rect.height.toFixed(2)}
+Canvas 内部尺寸: ${canvas.width} x ${canvas.height}
+缩放比例: scaleX=${scaleX.toFixed(4)}, scaleY=${scaleY.toFixed(4)}
+
+相对于 Canvas: x=${relativeX.toFixed(2)}, y=${relativeY.toFixed(2)}
+转换后坐标: x=${canvasX.toFixed(2)}, y=${canvasY.toFixed(2)}
+
+计算交叉点: col=${col}, row=${row}
+期望位置: x=${expectedX}, y=${expectedY}
+偏移误差: dx=${(canvasX - expectedX).toFixed(2)}, dy=${(canvasY - expectedY).toFixed(2)}
+
+设备像素比 (DPR): ${window.devicePixelRatio}
+            `.trim();
+            
+            debugInfo.textContent = info;
+            
+            // 在点击位置显示红点
+            const testPoint = document.createElement('div');
+            testPoint.className = 'test-point';
+            testPoint.style.left = relativeX + 'px';
+            testPoint.style.top = relativeY + 'px';
+            canvas.parentElement.appendChild(testPoint);
+            
+            // 在期望位置画绿圈
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(expectedX, expectedY, 15, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            console.log(info);
+        });
+        
+        // 初始化
+        drawTestBoard();
+        
+        // 窗口大小改变时重绘
+        window.addEventListener('resize', () => {
+            setTimeout(drawTestBoard, 100);
+        });
+    </script>
+</body>
+</html>

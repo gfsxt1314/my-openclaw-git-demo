@@ -1,0 +1,35 @@
+[2026-02-28T02:55:40+08:00] === Hook fired ===
+[2026-02-28T02:55:40+08:00] session= cwd= event=
+[2026-02-28T02:55:41+08:00] Meta file is 1772218541s old (>2h), ignoring stale meta
+[2026-02-28T02:55:41+08:00] Wrote latest.json
+[2026-02-28T02:55:41+08:00] === Hook completed ===
+[2026-02-28T02:55:41+08:00] === Hook fired ===
+[2026-02-28T02:55:41+08:00] session= cwd= event=
+[2026-02-28T02:55:42+08:00] Output from task-output.txt (428 chars)
+[2026-02-28T02:55:42+08:00] Meta file is 1772218542s old (>2h), ignoring stale meta
+[2026-02-28T02:55:42+08:00] Wrote latest.json
+[2026-02-28T02:55:42+08:00] === Hook completed ===
+[2026-02-28T02:58:18+08:00] === Hook fired ===
+[2026-02-28T02:58:18+08:00] session= cwd= event=
+[2026-02-28T02:58:19+08:00] Meta file is 1772218699s old (>2h), ignoring stale meta
+[2026-02-28T02:58:19+08:00] Wrote latest.json
+[2026-02-28T02:58:19+08:00] === Hook completed ===
+[2026-02-28T02:58:19+08:00] === Hook fired ===
+[2026-02-28T02:58:19+08:00] session= cwd= event=
+[2026-02-28T02:58:20+08:00] Output from task-output.txt (74 chars)
+[2026-02-28T02:58:20+08:00] Meta file is 1772218700s old (>2h), ignoring stale meta
+[2026-02-28T02:58:20+08:00] Wrote latest.json
+[2026-02-28T02:58:20+08:00] === Hook completed ===
+[2026-02-28T02:59:03+08:00] === Hook fired ===
+[2026-02-28T02:59:03+08:00] session= cwd= event=
+[2026-02-28T02:59:04+08:00] Meta: task=test-feishu-v2 group=oc_16a16b92d667f0138756b8d0c50cb867 age=5s
+[2026-02-28T02:59:05+08:00] Wrote latest.json
+[2026-02-28T02:59:08+08:00] Sent Feishu notification
+[2026-02-28T02:59:08+08:00] === Hook completed ===
+[2026-02-28T02:59:08+08:00] === Hook fired ===
+[2026-02-28T02:59:08+08:00] session= cwd= event=
+[2026-02-28T02:59:08+08:00] Duplicate hook within 5s, skipping
+[2026-02-28T03:16:48+08:00] === Hook fired ===
+[2026-02-28T03:16:48+08:00] session= cwd= event=
+[2026-02-28T03:16:49+08:00] Meta: task=gomoku-click-offset-deep-fix group=oc_16a16b92d667f0138756b8d0c50cb867 age=301s
+[2026-02-28T03:16:49+08:00] Wrote latest.json
