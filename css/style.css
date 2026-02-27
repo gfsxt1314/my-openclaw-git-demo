@@ -100,9 +100,14 @@ h1 {
 
 /* 响应式 */
 @media (max-width: 650px) {
+    .board-container {
+        padding: 10px;
+    }
+    
     #board {
-        width: 300px;
-        height: 300px;
+        width: 100%;
+        max-width: 350px;
+        height: auto;
     }
     
     h1 {

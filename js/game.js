@@ -149,8 +149,14 @@ class GobangGame {
             if (this.gameOver) return;
             
             const rect = this.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            
+            // 计算 Canvas 显示尺寸与内部尺寸的缩放比例
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            
+            // 将鼠标坐标转换为 Canvas 内部坐标
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
             
             // 计算点击的是哪个交叉点
             const col = Math.round((x - this.padding) / this.cellSize);
