@@ -72,29 +72,25 @@ class GobangGame {
         this.canvas.width = displayWidth * dpr;
         this.canvas.height = displayHeight * dpr;
         
-        // 不要覆盖 CSS 的尺寸设置！
-        // 只在 CSS 没有设置时才设置
-        if (!this.canvas.style.width) {
-            this.canvas.style.width = displayWidth + 'px';
-            this.canvas.style.height = displayHeight + 'px';
-        }
+        // 关键修复：使用 setTransform 重置变换矩阵，而不是 scale
+        // setTransform 替换整个矩阵，不会累积
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         
-        // 缩放上下文以匹配设备像素比
-        this.ctx.scale(dpr, dpr);
-        
-        // 保存缩放比例，用于点击坐标转换
-        // 关键：scaleX = 逻辑尺寸 / 显示尺寸
+        // 保存缩放比例，用于点击坐标转换和绘制
         this.scaleX = logicalSize / displayWidth;
         this.scaleY = logicalSize / displayHeight;
         this.displayWidth = displayWidth;
         this.displayHeight = displayHeight;
         this.dpr = dpr;
         
+        // 计算绘制时的缩放因子
+        this.drawScale = displayWidth / logicalSize;
+        
         console.log('Canvas 初始化:', { 
             logicalSize, 
             displayWidth, 
             displayHeight, 
-            scaleX: this.scaleX, 
+            drawScale: this.drawScale, 
             dpr 
         });
     }
@@ -112,18 +108,19 @@ class GobangGame {
             this.canvas.width = displayWidth * dpr;
             this.canvas.height = displayHeight * dpr;
             
-            // 重置缩放（因为 resize 时 ctx 会被重置）
-            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-            this.ctx.scale(dpr, dpr);
+            // 关键修复：使用 setTransform 重置变换矩阵
+            // 这替换整个矩阵，不会累积 scale
+            this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             
             // 更新缩放比例
             const logicalSize = this.padding * 2 + (this.boardSize - 1) * this.cellSize;
             this.scaleX = logicalSize / displayWidth;
-            this.scaleY = this.scaleX; // 保持宽高一致
+            this.scaleY = this.scaleX;
             this.displayWidth = displayWidth;
             this.displayHeight = displayHeight;
+            this.drawScale = displayWidth / logicalSize;
             
-            console.log('Canvas resize:', { displayWidth, displayHeight, scaleX: this.scaleX });
+            console.log('Canvas resize:', { displayWidth, displayHeight, drawScale: this.drawScale });
             
             // 重绘棋盘
             this.drawBoard();
@@ -134,6 +131,11 @@ class GobangGame {
         // 计算逻辑尺寸
         const logicalSize = this.padding * 2 + (this.boardSize - 1) * this.cellSize;
         
+        // 获取绘制缩放因子（默认为 1）
+        const scale = this.drawScale || 1;
+        const scaledPadding = this.padding * scale;
+        const scaledCellSize = this.cellSize * scale;
+        
         // 清空画布（使用显示尺寸）
         this.ctx.clearRect(0, 0, this.displayWidth || logicalSize, this.displayHeight || logicalSize);
         
@@ -141,32 +143,35 @@ class GobangGame {
         this.ctx.fillStyle = '#dcb35c';
         this.ctx.fillRect(0, 0, this.displayWidth || logicalSize, this.displayHeight || logicalSize);
         
-        // 画网格线
+        // 画网格线（使用缩放后的坐标）
         this.ctx.strokeStyle = '#000';
         this.ctx.lineWidth = 1;
         
         for (let i = 0; i < this.boardSize; i++) {
             // 横线
             this.ctx.beginPath();
-            this.ctx.moveTo(this.padding, this.padding + i * this.cellSize);
-            this.ctx.lineTo(this.padding + (this.boardSize - 1) * this.cellSize, this.padding + i * this.cellSize);
+            this.ctx.moveTo(scaledPadding, scaledPadding + i * scaledCellSize);
+            this.ctx.lineTo(scaledPadding + (this.boardSize - 1) * scaledCellSize, scaledPadding + i * scaledCellSize);
             this.ctx.stroke();
             
             // 竖线
             this.ctx.beginPath();
-            this.ctx.moveTo(this.padding + i * this.cellSize, this.padding);
-            this.ctx.lineTo(this.padding + i * this.cellSize, this.padding + (this.boardSize - 1) * this.cellSize);
+            this.ctx.moveTo(scaledPadding + i * scaledCellSize, scaledPadding);
+            this.ctx.lineTo(scaledPadding + i * scaledCellSize, scaledPadding + (this.boardSize - 1) * scaledCellSize);
             this.ctx.stroke();
         }
         
         // 画天元和星位
-        this.drawStarPoints();
+        this.drawStarPoints(scale);
         
         // 画棋子
-        this.drawPieces();
+        this.drawPieces(scale);
     }
     
-    drawStarPoints() {
+    drawStarPoints(scale = 1) {
+        const scaledPadding = this.padding * scale;
+        const scaledCellSize = this.cellSize * scale;
+        
         const starPoints = [
             [3, 3], [3, 11], [7, 7], [11, 3], [11, 11]
         ];
@@ -175,35 +180,38 @@ class GobangGame {
         starPoints.forEach(([x, y]) => {
             this.ctx.beginPath();
             this.ctx.arc(
-                this.padding + x * this.cellSize,
-                this.padding + y * this.cellSize,
-                4, 0, Math.PI * 2
+                scaledPadding + x * scaledCellSize,
+                scaledPadding + y * scaledCellSize,
+                4 * scale, 0, Math.PI * 2
             );
             this.ctx.fill();
         });
     }
     
-    drawPieces() {
+    drawPieces(scale = 1) {
         for (let i = 0; i < this.boardSize; i++) {
             for (let j = 0; j < this.boardSize; j++) {
                 if (this.board[i][j] !== 0) {
-                    this.drawPiece(i, j, this.board[i][j]);
+                    this.drawPiece(i, j, this.board[i][j], scale);
                 }
             }
         }
     }
     
-    drawPiece(x, y, player) {
-        const centerX = this.padding + x * this.cellSize;
-        const centerY = this.padding + y * this.cellSize;
-        const radius = this.cellSize * 0.4;
+    drawPiece(x, y, player, scale = 1) {
+        const scaledPadding = this.padding * scale;
+        const scaledCellSize = this.cellSize * scale;
+        
+        const centerX = scaledPadding + x * scaledCellSize;
+        const centerY = scaledPadding + y * scaledCellSize;
+        const radius = scaledCellSize * 0.4;
         
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         
         // 创建渐变效果
         const gradient = this.ctx.createRadialGradient(
-            centerX - 5, centerY - 5, 0,
+            centerX - 5 * scale, centerY - 5 * scale, 0,
             centerX, centerY, radius
         );
         
@@ -222,9 +230,9 @@ class GobangGame {
         
         // 添加阴影
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.shadowBlur = 4;
-        this.ctx.shadowOffsetX = 2;
-        this.ctx.shadowOffsetY = 2;
+        this.ctx.shadowBlur = 4 * scale;
+        this.ctx.shadowOffsetX = 2 * scale;
+        this.ctx.shadowOffsetY = 2 * scale;
         this.ctx.stroke();
         
         // 重置阴影
