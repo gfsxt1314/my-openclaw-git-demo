@@ -76,6 +76,9 @@ h1 {
 #board {
     display: block;
     cursor: pointer;
+    /* 默认尺寸，JS 会根据设备像素比调整 */
+    width: 600px;
+    height: 600px;
 }
 
 .footer {

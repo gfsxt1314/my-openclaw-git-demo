@@ -33,3 +33,58 @@
 [2026-02-28T03:16:48+08:00] session= cwd= event=
 [2026-02-28T03:16:49+08:00] Meta: task=gomoku-click-offset-deep-fix group=oc_16a16b92d667f0138756b8d0c50cb867 age=301s
 [2026-02-28T03:16:49+08:00] Wrote latest.json
+[2026-03-26T13:42:24+08:00] === Hook fired ===
+[2026-03-26T13:42:24+08:00] session= cwd= event=
+[2026-03-26T13:42:25+08:00] === Hook fired ===
+[2026-03-26T13:42:25+08:00] session= cwd= event=
+[2026-03-26T13:42:25+08:00] Duplicate hook within 1s, skipping
+[2026-03-26T13:42:25+08:00] Meta: task=gomoku-click-offset-deep-fix group=oc_16a16b92d667f0138756b8d0c50cb867 age=34s
+[2026-03-26T13:42:25+08:00] Wrote latest.json
+[2026-03-26T13:42:27+08:00] === Hook fired ===
+[2026-03-26T13:42:27+08:00] session= cwd= event=
+[2026-03-26T13:42:27+08:00] Duplicate hook within 3s, skipping
+[2026-03-26T13:42:28+08:00] === Hook fired ===
+[2026-03-26T13:42:28+08:00] session= cwd= event=
+[2026-03-26T13:42:28+08:00] Duplicate hook within 4s, skipping
+[2026-03-26T13:42:28+08:00] Feishu send failed
+[2026-03-26T13:42:28+08:00] === Hook completed ===
+[2026-03-26T13:42:29+08:00] === Hook fired ===
+[2026-03-26T13:42:29+08:00] session= cwd= event=
+[2026-03-26T13:42:29+08:00] Duplicate hook within 5s, skipping
+[2026-03-26T13:42:30+08:00] === Hook fired ===
+[2026-03-26T13:42:30+08:00] session= cwd= event=
+[2026-03-26T13:42:30+08:00] Duplicate hook within 6s, skipping
+[2026-03-26T13:42:31+08:00] === Hook fired ===
+[2026-03-26T13:42:31+08:00] session= cwd= event=
+[2026-03-26T13:42:31+08:00] Duplicate hook within 7s, skipping
+[2026-03-26T13:42:32+08:00] === Hook fired ===
+[2026-03-26T13:42:32+08:00] session= cwd= event=
+[2026-03-26T13:42:32+08:00] Duplicate hook within 8s, skipping
+[2026-03-26T13:42:33+08:00] === Hook fired ===
+[2026-03-26T13:42:33+08:00] session= cwd= event=
+[2026-03-26T13:42:33+08:00] Duplicate hook within 9s, skipping
+[2026-03-26T13:42:33+08:00] === Hook fired ===
+[2026-03-26T13:42:33+08:00] session= cwd= event=
+[2026-03-26T13:42:33+08:00] Duplicate hook within 9s, skipping
+[2026-03-26T22:51:45+08:00] === Hook fired ===
+[2026-03-26T22:51:45+08:00] session= cwd= event=
+[2026-03-26T22:51:46+08:00] Meta file is 32995s old (>2h), ignoring stale meta
+[2026-03-26T22:51:46+08:00] Wrote latest.json
+[2026-03-26T22:51:46+08:00] === Hook completed ===
+[2026-03-26T22:51:46+08:00] === Hook fired ===
+[2026-03-26T22:51:46+08:00] session= cwd= event=
+[2026-03-26T22:51:46+08:00] Duplicate hook within 1s, skipping
+[2026-03-26T22:51:47+08:00] === Hook fired ===
+[2026-03-26T22:51:47+08:00] session= cwd= event=
+[2026-03-26T22:51:47+08:00] Duplicate hook within 2s, skipping
+[2026-03-26T22:51:48+08:00] === Hook fired ===
+[2026-03-26T22:51:48+08:00] session= cwd= event=
+[2026-03-26T22:51:48+08:00] Duplicate hook within 3s, skipping
+[2026-03-26T22:54:14+08:00] === Hook fired ===
+[2026-03-26T22:54:14+08:00] session= cwd= event=
+[2026-03-26T22:54:15+08:00] Meta file is 33144s old (>2h), ignoring stale meta
+[2026-03-26T22:54:15+08:00] Wrote latest.json
+[2026-03-26T22:54:15+08:00] === Hook completed ===
+[2026-03-26T22:54:16+08:00] === Hook fired ===
+[2026-03-26T22:54:16+08:00] session= cwd= event=
+[2026-03-26T22:54:16+08:00] Duplicate hook within 2s, skipping

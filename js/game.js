@@ -23,6 +23,9 @@ class GobangGame {
         // 初始化
         this.init();
         this.bindEvents();
+        
+        // 监听窗口大小变化，重新调整 Canvas
+        window.addEventListener('resize', () => this.handleResize());
     }
     
     init() {
@@ -39,22 +42,74 @@ class GobangGame {
         this.gameOver = false;
         this.winner = null;
         
-        // 设置 Canvas 内部尺寸（逻辑尺寸）
-        const logicalSize = this.padding * 2 + (this.boardSize - 1) * this.cellSize;
-        this.canvas.width = logicalSize;
-        this.canvas.height = logicalSize;
+        // 设置 Canvas 尺寸（考虑 devicePixelRatio）
+        this.setupCanvas();
         
         this.updateStatus();
         this.drawBoard();
     }
     
+    setupCanvas() {
+        // 计算逻辑尺寸
+        const logicalSize = this.padding * 2 + (this.boardSize - 1) * this.cellSize;
+        
+        // 获取设备像素比（Retina 屏幕通常是 2 或 3）
+        const dpr = window.devicePixelRatio || 1;
+        
+        // 获取 Canvas 的显示尺寸（CSS 设置的尺寸）
+        const rect = this.canvas.getBoundingClientRect();
+        const displayWidth = rect.width || logicalSize;
+        const displayHeight = rect.height || logicalSize;
+        
+        // 设置 Canvas 内部像素尺寸（高分辨率）
+        this.canvas.width = displayWidth * dpr;
+        this.canvas.height = displayHeight * dpr;
+        
+        // 设置 CSS 显示尺寸
+        this.canvas.style.width = displayWidth + 'px';
+        this.canvas.style.height = displayHeight + 'px';
+        
+        // 缩放上下文以匹配设备像素比
+        this.ctx.scale(dpr, dpr);
+        
+        // 保存缩放比例，用于点击坐标转换
+        this.scaleX = logicalSize / displayWidth;
+        this.scaleY = logicalSize / displayHeight;
+        this.displayWidth = displayWidth;
+        this.displayHeight = displayHeight;
+        this.dpr = dpr;
+    }
+    
+    handleResize() {
+        // 重新设置 Canvas 尺寸
+        const dpr = window.devicePixelRatio || 1;
+        const rect = this.canvas.getBoundingClientRect();
+        
+        if (rect.width > 0 && rect.height > 0) {
+            this.canvas.width = rect.width * dpr;
+            this.canvas.height = rect.height * dpr;
+            this.ctx.scale(dpr, dpr);
+            
+            this.scaleX = (this.padding * 2 + (this.boardSize - 1) * this.cellSize) / rect.width;
+            this.scaleY = this.scaleX; // 保持宽高一致
+            this.displayWidth = rect.width;
+            this.displayHeight = rect.height;
+            
+            // 重绘棋盘
+            this.drawBoard();
+        }
+    }
+    
     drawBoard() {
-        // 清空画布
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        // 计算逻辑尺寸
+        const logicalSize = this.padding * 2 + (this.boardSize - 1) * this.cellSize;
+        
+        // 清空画布（使用显示尺寸）
+        this.ctx.clearRect(0, 0, this.displayWidth || logicalSize, this.displayHeight || logicalSize);
         
         // 画棋盘背景
         this.ctx.fillStyle = '#dcb35c';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(0, 0, this.displayWidth || logicalSize, this.displayHeight || logicalSize);
         
         // 画网格线
         this.ctx.strokeStyle = '#000';
@@ -150,39 +205,57 @@ class GobangGame {
     }
     
     bindEvents() {
-        this.canvas.addEventListener('click', (e) => {
-            if (this.gameOver) return;
-            
-            const rect = this.canvas.getBoundingClientRect();
-            
-            // 计算 Canvas 实际显示尺寸与内部尺寸的缩放比例
-            // this.canvas.width/height 是 Canvas 的内部像素尺寸（600x600）
-            // rect.width/height 是 Canvas 在页面上的实际显示尺寸（可能经过 CSS 缩放）
-            const scaleX = this.canvas.width / rect.width;
-            const scaleY = this.canvas.height / rect.height;
-            
-            // 将鼠标坐标（相对于视口）转换为 Canvas 内部坐标
-            // 考虑可能的滚动偏移（虽然 getBoundingClientRect 已经包含滚动）
-            const x = (e.clientX - rect.left) * scaleX;
-            const y = (e.clientY - rect.top) * scaleY;
-            
-            // 计算点击的是哪个交叉点
-            const col = Math.round((x - this.padding) / this.cellSize);
-            const row = Math.round((y - this.padding) / this.cellSize);
-            
-            // 检查是否在有效范围内
-            if (col < 0 || col >= this.boardSize || row < 0 || row >= this.boardSize) {
-                return;
-            }
-            
-            // 检查该位置是否已有棋子
-            if (this.board[row][col] !== 0) {
-                return;
-            }
-            
-            // 落子
-            this.placePiece(row, col);
-        });
+        // 使用 touch-action 防止触摸滚动
+        this.canvas.style.touchAction = 'none';
+        
+        // 鼠标点击
+        this.canvas.addEventListener('click', (e) => this.handleClick(e));
+        
+        // 触摸支持
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // 防止滚动和缩放
+            const touch = e.touches[0];
+            this.handleClick(touch);
+        }, { passive: false });
+    }
+    
+    handleClick(e) {
+        if (this.gameOver) return;
+        
+        const rect = this.canvas.getBoundingClientRect();
+        
+        // 获取点击/触摸坐标
+        const clientX = e.clientX !== undefined ? e.clientX : e.pageX - window.scrollX;
+        const clientY = e.clientY !== undefined ? e.clientY : e.pageY - window.scrollY;
+        
+        // 计算相对于 Canvas 的坐标
+        const canvasX = clientX - rect.left;
+        const canvasY = clientY - rect.top;
+        
+        // 转换为游戏逻辑坐标
+        // 考虑 CSS 缩放和设备像素比
+        const x = canvasX * this.scaleX;
+        const y = canvasY * this.scaleY;
+        
+        // 计算点击的是哪个交叉点
+        const col = Math.round((x - this.padding) / this.cellSize);
+        const row = Math.round((y - this.padding) / this.cellSize);
+        
+        // 调试日志（可在浏览器控制台查看）
+        console.log('点击坐标:', { canvasX, canvasY, x, y, row, col, scaleX: this.scaleX });
+        
+        // 检查是否在有效范围内
+        if (col < 0 || col >= this.boardSize || row < 0 || row >= this.boardSize) {
+            return;
+        }
+        
+        // 检查该位置是否已有棋子
+        if (this.board[row][col] !== 0) {
+            return;
+        }
+        
+        // 落子
+        this.placePiece(row, col);
     }
     
     placePiece(row, col) {
