@@ -58,26 +58,45 @@ class GobangGame {
         
         // 获取 Canvas 的显示尺寸（CSS 设置的尺寸）
         const rect = this.canvas.getBoundingClientRect();
-        const displayWidth = rect.width || logicalSize;
-        const displayHeight = rect.height || logicalSize;
+        let displayWidth = rect.width;
+        let displayHeight = rect.height;
+        
+        // 如果 getBoundingClientRect 返回 0，说明 CSS 还没应用
+        // 使用 requestAnimationFrame 延迟初始化
+        if (displayWidth === 0 || displayHeight === 0) {
+            requestAnimationFrame(() => this.setupCanvas());
+            return;
+        }
         
         // 设置 Canvas 内部像素尺寸（高分辨率）
         this.canvas.width = displayWidth * dpr;
         this.canvas.height = displayHeight * dpr;
         
-        // 设置 CSS 显示尺寸
-        this.canvas.style.width = displayWidth + 'px';
-        this.canvas.style.height = displayHeight + 'px';
+        // 不要覆盖 CSS 的尺寸设置！
+        // 只在 CSS 没有设置时才设置
+        if (!this.canvas.style.width) {
+            this.canvas.style.width = displayWidth + 'px';
+            this.canvas.style.height = displayHeight + 'px';
+        }
         
         // 缩放上下文以匹配设备像素比
         this.ctx.scale(dpr, dpr);
         
         // 保存缩放比例，用于点击坐标转换
+        // 关键：scaleX = 逻辑尺寸 / 显示尺寸
         this.scaleX = logicalSize / displayWidth;
         this.scaleY = logicalSize / displayHeight;
         this.displayWidth = displayWidth;
         this.displayHeight = displayHeight;
         this.dpr = dpr;
+        
+        console.log('Canvas 初始化:', { 
+            logicalSize, 
+            displayWidth, 
+            displayHeight, 
+            scaleX: this.scaleX, 
+            dpr 
+        });
     }
     
     handleResize() {
@@ -86,14 +105,25 @@ class GobangGame {
         const rect = this.canvas.getBoundingClientRect();
         
         if (rect.width > 0 && rect.height > 0) {
-            this.canvas.width = rect.width * dpr;
-            this.canvas.height = rect.height * dpr;
+            const displayWidth = rect.width;
+            const displayHeight = rect.height;
+            
+            // 设置 Canvas 内部像素尺寸
+            this.canvas.width = displayWidth * dpr;
+            this.canvas.height = displayHeight * dpr;
+            
+            // 重置缩放（因为 resize 时 ctx 会被重置）
+            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
             this.ctx.scale(dpr, dpr);
             
-            this.scaleX = (this.padding * 2 + (this.boardSize - 1) * this.cellSize) / rect.width;
+            // 更新缩放比例
+            const logicalSize = this.padding * 2 + (this.boardSize - 1) * this.cellSize;
+            this.scaleX = logicalSize / displayWidth;
             this.scaleY = this.scaleX; // 保持宽高一致
-            this.displayWidth = rect.width;
-            this.displayHeight = rect.height;
+            this.displayWidth = displayWidth;
+            this.displayHeight = displayHeight;
+            
+            console.log('Canvas resize:', { displayWidth, displayHeight, scaleX: this.scaleX });
             
             // 重绘棋盘
             this.drawBoard();
