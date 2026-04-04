@@ -174,15 +174,17 @@ class GobangGame {
         for (let i = 0; i < this.boardSize; i++) {
             for (let j = 0; j < this.boardSize; j++) {
                 if (this.board[i][j] !== 0) {
-                    this.drawPiece(i, j, this.board[i][j]);
+                    // i=行(y), j=列(x)，drawPiece 参数顺序是 (x, y, player)
+                    this.drawPiece(j, i, this.board[i][j]);
                 }
             }
         }
     }
 
-    drawPiece(x, y, player) {
-        const centerX = this.padding + x * this.cellSize;
-        const centerY = this.padding + y * this.cellSize;
+    drawPiece(col, row, player) {
+        // col = 列 = x 坐标，row = 行 = y 坐标
+        const centerX = this.padding + col * this.cellSize;
+        const centerY = this.padding + row * this.cellSize;
         const radius = this.cellSize * 0.4;
 
         this.ctx.beginPath();
